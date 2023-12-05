@@ -1,0 +1,16 @@
+html
+  head
+    title Store List - #{appName}
+  body
+    header
+      h1 Grocery Stores - #{appName}
+    main
+      h2 Discounted Stores
+      ul
+        each store in stores
+          li
+            a(href=`/store/${store.id}`) #{store.name}
+            p Location: #{store.location}
+            p Rating: #{store.rating}
+    footer
+      p © 2023 #{appName}
