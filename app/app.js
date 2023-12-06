@@ -7,62 +7,60 @@ var app = express();
 // Add static files location
 app.use(express.static("static"));
 
+// Use the Pug templating engine
+app.set('view engine', 'pug');
+app.set('views', './app/views');
+
 // Get the functions in the db.js file to use
 const db = require('./services/db');
 
-// Create a route for root - /
-app.get("/", function(req, res) {
-    res.send("Hello world!");
+app.get("/", function (req, res) {
+    const sql = 'SELECT * FROM reducer_items';
+
+    db.query(sql)
+        .then(results => {
+            res.render('index', { title: 'reducer items', data: results });
+        })
 });
 
-// Create a route for testing the db
-app.get("/db_test", function(req, res) {
-    // Assumes a table called test_table exists in your database
-    sql = 'select * from test_table';
-    db.query(sql).then(results => {
-        console.log(results);
-        res.send(results)
-    });
+
+app.get("/store_details", function (req, res) {
+    const sql = 'SELECT * FROM reducer_items';
+
+    db.query(sql)
+        .then(results => {
+            res.render('store_details', { title: 'Store details', data: results });
+        })
 });
 
-// Create a route for /goodbye
-// Responds to a 'GET' request
-app.get("/goodbye", function(req, res) {
-    res.send("Goodbye world!");
+app.get("/fooditemdetails", function (req, res) {
+    const sql = 'SELECT * FROM reducer_items';
+
+    db.query(sql)
+        .then(results => {
+            res.render('fooditemdetails', { title: 'food item details', data: results });
+        })
 });
 
-// Create a dynamic route for /hello/<name>, where name is any value provided by user
-// At the end of the URL
-// Responds to a 'GET' request
-app.get("/hello/:name", function(req, res) {
-    // req.params contains any parameters in the request
-    // We can examine it in the console for debugging purposes
-    console.log(req.params);
-    //  Retrieve the 'name' parameter and use it in a dynamically generated page
-    res.send("Hello " + req.params.name);
-});
-// Sample data (replace this with actual database queries)
-const stores = [
-  { id: 1, name: 'Store A', location: 'City A, State A', rating: 4.5 },
-  { id: 2, name: 'Store B', location: 'City B, State B', rating: 4.0 },
-];
+app.get("/profile", function (req, res) {
+    const sql = 'SELECT * FROM reducer_items';
 
-// Define routes
-app.get('/', (req, res) => {
-  res.render('homepage', { appName: 'Your App Name', tagline: 'Your tagline here' });
+    db.query(sql)
+        .then(results => {
+            res.render('profile', { title: 'profile', data: results });
+        })
 });
 
-app.get('/store-list', (req, res) => {
-  res.render('store-list', { appName: 'Your App Name', stores });
+app.get("/analytics", function (req, res) {
+    const sql = 'SELECT * FROM reducer_items';
+
+    db.query(sql)
+        .then(results => {
+            res.render('analytics', { title: 'analytics', data: results });
+        })
 });
 
-// Other routes...
-
-// Set up Pug as the view engine
-app.set('view engine', 'pug');
-
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Start server on port 3000
+app.listen(3000, function () {
+    console.log(`Server running at http://127.0.0.1:3000/`);
 });
