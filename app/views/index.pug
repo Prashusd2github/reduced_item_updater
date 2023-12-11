@@ -1,0 +1,21 @@
+doctype html
+html
+  head
+    title Reducer Item Updater
+  body
+    include menu 
+    table
+      thead
+        tr
+          th Item Name
+          th Actual Price
+          th Reduced Price
+          th Discount
+
+      tbody
+        each item in data
+          tr
+            td= item.item_name
+            td= item.actual_price
+            td= item.reduce_price
+            td= item.discount
