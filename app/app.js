@@ -2,6 +2,7 @@
 const express = require("express");
 const session = require("express-session");
 const { User } = require("./models/user");
+const { Item } = require("./models/items");
 
 // Create express app
 const app = express();
@@ -35,21 +36,24 @@ app.get('/register', function (req, res) {
 app.get('/login', function (req, res) {
     res.render('login');
 });
+// Login route
+app.get('/', function (req, res) {
+    res.render('login');
+});
 
-app.get("/", function (req, res) {
+app.get("/main", function (req, res) {
     
-    const sql = 'SELECT * FROM reducer_items';
+    const sql = 'SELECT * FROM items';
 
     db.query(sql)
         .then(results => {
-            res.render('index', { title: 'reducer items', data: results });
+            res.render('main', { title: 'reducer items', data: results });
         })
 });
 
 
 app.get("/store_details", function (req, res) {
-    const sql = 'SELECT * FROM reducer_items';
-
+    const sql = 'SELECT * FROM store';
     db.query(sql)
         .then(results => {
             res.render('store_details', { title: 'Store details', data: results });
@@ -57,8 +61,7 @@ app.get("/store_details", function (req, res) {
 });
 
 app.get("/fooditemdetails", function (req, res) {
-    const sql = 'SELECT * FROM reducer_items';
-
+    const sql = 'SELECT * FROM items';
     db.query(sql)
         .then(results => {
             res.render('fooditemdetails', { title: 'food item details', data: results });
@@ -66,7 +69,7 @@ app.get("/fooditemdetails", function (req, res) {
 });
 
 app.get("/profile", function (req, res) {
-    const sql = 'SELECT * FROM reducer_items';
+    const sql = 'SELECT * FROM items';
 
     db.query(sql)
         .then(results => {
@@ -75,12 +78,62 @@ app.get("/profile", function (req, res) {
 });
 
 app.get("/analytics", function (req, res) {
-    const sql = 'SELECT * FROM reducer_items';
+    const sql = 'SELECT * FROM items';
 
     db.query(sql)
         .then(results => {
             res.render('analytics', { title: 'analytics', data: results });
         })
+});
+
+app.get("/item_details/:id", async function (req, res) {
+    const id = req.params.id;
+    try {
+        const item = await Item.getItemById(id);
+        console.log(item);
+        res.render('item_details', { item: item });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Create Item route
+app.get('/create-item', async function (req, res) {
+    // You may need to fetch additional data for creating an item
+    // For example, a list of stores or other necessary information
+    // Adjust the query accordingly
+    const sql = 'SELECT * FROM store';
+    try {
+        const stores = await db.query(sql);
+        res.render('create-item', { stores, currentPage: 'create-item' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.post("/create-item", async function (req, res) {
+    const { item_name, actual_price, reduce_price, discount, store_id, items_available } = req.body;
+    try {
+        const newItem = new Item(item_name, actual_price, reduce_price, discount, store_id, items_available);
+        await newItem.createItem();
+        res.render('create-item', { successMessage: 'Item created successfully' });
+    } catch (error) {
+        console.error(error);
+        res.render('create-item', { errorMessage: 'Internal Server Error' });
+    }
+});
+
+app.get("/delete-item/:id", async function (req, res) {
+    const itemId = req.params.id;
+    try {
+        await Item.deleteItem(itemId);
+        res.render('edit-item', { successMessage: `Item ${itemId} deleted successfully`, itemId });
+    } catch (error) {
+        console.error(error);
+        res.render('edit-item', { errorMessage: 'Internal Server Error', itemId });
+    }
 });
 
 
@@ -93,7 +146,7 @@ app.post('/set-password', async function (req, res) {
             // If a valid, existing user is found, set the password and redirect to the users single-student page
             await user.setUserPassword(params.password);
             console.log(req.session.id);
-            res.send('Password set successfully');
+            res.render('', { title: 'analytics', data: results });
         }
         else {
             // If no existing user is found, add a new one

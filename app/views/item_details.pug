@@ -1,0 +1,35 @@
+include menu
+doctype html
+html
+  head
+    title Reducer Item Updater
+  body(style="font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;")
+    
+    header(style="background-color: #333; color: white; padding: 10px; text-align: center;")
+    h1(style="text-align: center;") Item Details
+    div.card(style="background-color: #fff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 5px; padding: 20px; margin: 20px auto; max-width: 400px;")
+      ul(style="list-style-type: none; padding: 0;")
+        li(style="margin-bottom: 10px;")
+          strong Item ID:
+          span(style="color: #333;") #{item[0].item_id}
+        li(style="margin-bottom: 10px;")
+          strong Item Name:
+          span(style="color: #333;") #{item[0].item_name}
+        li(style="margin-bottom: 10px;")
+          strong Actual Price:
+          span(style="color: #333;") #{item[0].actual_price}
+        li(style="margin-bottom: 10px;")
+          strong Reduced Price:
+          span(style="color: #333;") #{item[0].reduce_price}
+        li(style="margin-bottom: 10px;")
+          strong Discount:
+          span(style="color: #333;") #{item[0].discount}
+        li(style="margin-bottom: 10px;")
+          strong Store Name:
+          span(style="color: #333;") #{item[0].store_name}
+        li(style="margin-bottom: 10px;")
+          strong Store Location:
+          span(style="color: #333;") #{item[0].location}
+        li(style="margin-bottom: 10px;")
+          strong Items Available:
+          span(style="color: #333;") #{item[0].items_available}

@@ -14,8 +14,13 @@ html
 
       tbody
         each item in data
-          tr
+          tr(style="cursor: pointer;", onclick=`redirectToStoreDetails(${item.store_id})`)
             td= item.item_name
             td= item.actual_price
             td= item.reduce_price
             td= item.discount
+
+    script.
+      function redirectToStoreDetails(storeId) {
+        window.location.href = "/item_details/" + storeId;
+      }

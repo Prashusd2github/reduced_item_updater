@@ -1,7 +1,19 @@
 doctype html
 html
   head
-    title My Website
+    title Reducer Item Updater
   body
     include menu 
-    h1 Store Details
+    table
+      thead
+        tr
+          th ID
+          th Store Name
+          th Location
+
+      tbody
+        each item in data
+          tr
+            td= item.store_id
+            td= item.store_name
+            td= item.location
