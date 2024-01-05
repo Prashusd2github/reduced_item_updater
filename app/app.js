@@ -99,29 +99,28 @@ app.get("/item_details/:id", async function (req, res) {
 });
 
 // Create Item route
-app.get('/create-item', async function (req, res) {
-    // You may need to fetch additional data for creating an item
-    // For example, a list of stores or other necessary information
-    // Adjust the query accordingly
+app.get('/create_item', async function (req, res) {
     const sql = 'SELECT * FROM store';
+
     try {
-        const stores = await db.query(sql);
-        res.render('create-item', { stores, currentPage: 'create-item' });
+        const results = await db.query(sql);
+        res.render('create_item', { title: 'create_item', stores: results });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).send('Internal Server Error');
     }
 });
+
 
 app.post("/create-item", async function (req, res) {
     const { item_name, actual_price, reduce_price, discount, store_id, items_available } = req.body;
     try {
         const newItem = new Item(item_name, actual_price, reduce_price, discount, store_id, items_available);
         await newItem.createItem();
-        res.render('create-item', { successMessage: 'Item created successfully' });
+        res.render('create_item', { successMessage: 'Item created successfully' });
     } catch (error) {
         console.error(error);
-        res.render('create-item', { errorMessage: 'Internal Server Error' });
+        res.render('create_item', { errorMessage: 'Internal Server Error' });
     }
 });
 
@@ -138,48 +137,46 @@ app.get("/delete-item/:id", async function (req, res) {
 
 
 app.post('/set-password', async function (req, res) {
-    params = req.body;
-    var user = new User(params.email);
+    const params = req.body; // Declare as const
+    const user = new User(params.email);
+
     try {
-        uId = await user.getIdFromEmail();
+        const uId = await user.getIdFromEmail();
         if (uId) {
-            // If a valid, existing user is found, set the password and redirect to the users single-student page
             await user.setUserPassword(params.password);
             console.log(req.session.id);
-            res.render('', { title: 'analytics', data: results });
-        }
-        else {
-            // If no existing user is found, add a new one
-            newId = await user.addUser(params.email);
-            res.send('Perhaps a page where a new user sets a programme would be good here');
+            res.send('password reset succesfully');
+        } else {
+            const newId = await user.addUser(params.email);
+            res.send('Account created succesfully');
         }
     } catch (err) {
-        console.error(`Error while adding password `, err.message);
+        console.error(`Error while setting password `, err.message);
+        res.send('An error occurred while setting the password');
     }
 });
 
 
 // Check submitted email and password pair
 app.post('/authenticate', async function (req, res) {
-    params = req.body;
-    var user = new User(params.email);
+    const params = req.body; // Declare as const
+    const user = new User(params.email);
+    
     try {
-        uId = await user.getIdFromEmail();
+        const uId = await user.getIdFromEmail();
         if (uId) {
-            match = await user.authenticate(params.password);
+            const match = await user.authenticate(params.password);
+            console.log(match);
             if (match) {
                 req.session.uid = uId;
                 req.session.loggedIn = true;
                 console.log(req.session.id);
-                res.redirect('/');
+                res.redirect('/main');
+            } else {
+                res.send('Invalid email');
             }
-            else {
-                // TODO improve the user journey here
-                res.send('invalid password');
-            }
-        }
-        else {
-            res.send('invalid email');
+        } else {
+            res.send('Invalid email');
         }
     } catch (err) {
         console.error(`Error while comparing `, err.message);
