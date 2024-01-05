@@ -2,6 +2,7 @@ doctype html
 html
   head
     title Reducer Item Updater
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css')
     style.
       body {
         font-family: 'Arial', sans-serif;
@@ -65,4 +66,42 @@ html
             a(href="/store_details") Store Details
           li
             a(href="/create_item") Create Item
+          li
+            a(href="#" class="notification-icon")
+            i(class="fas fa-bell")
 
+script.
+  document.addEventListener('DOMContentLoaded', async function () {
+    const notificationIcon = document.querySelector('.notification-icon');
+
+    // Fetch notification count from the server
+    const notificationCount = await fetch('/notification-count')
+      .then(response => response.json())
+      .then(data => data.count)
+      .catch(error => {
+        console.error('Error fetching notification count:', error);
+        return 0;
+      });
+
+    // Update the DOM with the notification count
+    if (notificationCount > 0) {
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = notificationCount;
+
+      // Add style for red color and top-left position
+      badge.style.backgroundColor = 'red';
+      badge.style.position = 'absolute';
+      badge.style.top = '0';
+      badge.style.left = '0';
+
+      notificationIcon.style.position = 'relative';
+      notificationIcon.appendChild(badge);
+    }
+
+    // Add event listener for notification icon click
+    notificationIcon.addEventListener('click', function() {
+      // Redirect to the notification page
+      window.location.href = '/notifications';
+    });
+  });

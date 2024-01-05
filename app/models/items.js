@@ -30,7 +30,7 @@ class Item {
     let sql = "INSERT INTO items (item_name, actual_price, reduce_price, discount, store_id, items_available) VALUES (?, ?, ?, ?, ?, ?)";
     const result = await db.query(sql, [this.item_name, this.actual_price, this.reduce_price, this.discount, this.store_id, this.items_available]);
     this.item_id = result.insertId;
-    return true;
+    return this.item_id;
   }
 
   // Read items for a store

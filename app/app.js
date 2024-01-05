@@ -51,6 +51,17 @@ app.get("/main", function (req, res) {
         })
 });
 
+app.get("/notifications", function (req, res) {
+    
+    const sql = 'SELECT items.* FROM items,notifications where items.item_id = notifications.item_id';
+
+    db.query(sql)
+        .then(results => {
+            res.render('notifications', { title: 'notifications', data: results });
+        })
+});
+
+
 
 app.get("/store_details", function (req, res) {
     const sql = 'SELECT * FROM store';
@@ -114,15 +125,47 @@ app.get('/create_item', async function (req, res) {
 
 app.post("/create-item", async function (req, res) {
     const { item_name, actual_price, reduce_price, discount, store_id, items_available } = req.body;
+
     try {
+        // Create a new item
         const newItem = new Item(item_name, actual_price, reduce_price, discount, store_id, items_available);
-        await newItem.createItem();
+        const createdItemId = await newItem.createItem();
+
+        // After creating the item successfully, add a notification
+        await addNotification(createdItemId);
+
         res.render('create_item', { successMessage: 'Item created successfully' });
     } catch (error) {
         console.error(error);
         res.render('create_item', { errorMessage: 'Internal Server Error' });
     }
 });
+
+// Function to add a notification
+async function addNotification(itemId) {
+    const sql = 'INSERT INTO notifications (item_id) VALUES (?)';
+
+    try {
+        await db.query(sql, [itemId]);
+    } catch (error) {
+        console.error('Error adding notification:', error);
+        throw error;
+    }
+}
+
+app.get("/notification-count", async function (req, res) {
+    try {
+        const sql = 'SELECT COUNT(*) AS count FROM notifications';
+        const result = await db.query(sql);
+        const notificationCount = result[0].count;
+        
+        res.json({ count: notificationCount });
+    } catch (error) {
+        console.error('Error fetching notification count:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 
 app.get("/delete-item/:id", async function (req, res) {
     const itemId = req.params.id;
